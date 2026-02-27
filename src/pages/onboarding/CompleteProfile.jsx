@@ -1,0 +1,113 @@
+import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { useAuth } from '../../context/AuthContext'
+import { updateUserProfile } from '../../services/userDbService'
+
+const CompleteProfile = () => {
+    const { user, setUser } = useAuth()
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+
+    const [form, setForm] = useState({
+        phone: '',
+        region: '',
+        college: user?.college || '',
+    })
+
+    const handleFinalRedirect = useCallback(() => {
+        if (user.role === 'buyer') navigate('/buyer-dashboard')
+        else if (user.role === 'seller') navigate('/seller-dashboard')
+        else if (user.role === 'admin') navigate('/admin')
+        else navigate('/home')
+    }, [user, navigate])
+
+    // If suddenly logged out, or already complete
+    useEffect(() => {
+        if (!user) {
+            navigate('/login')
+        } else if (user.profileComplete) {
+            handleFinalRedirect()
+        }
+    }, [user, navigate, handleFinalRedirect])
+
+    const handleChange = (e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        if (!form.phone || !form.region || !form.college) {
+            setError('Please complete all fields.')
+            return
+        }
+        setLoading(true)
+        setError('')
+
+        try {
+            const updates = {
+                phone: form.phone,
+                region: form.region,
+                college: form.college,
+                profileComplete: true,
+            }
+            // Update RTDB
+            await updateUserProfile(user._id, updates)
+
+            // Update AuthContext & localStorage
+            const updatedUser = { ...user, ...updates }
+            setUser(updatedUser)
+            localStorage.setItem('vanik_user', JSON.stringify(updatedUser))
+
+            // Redirect based on role (Note: Sellers might be blocked by RoleProtected if not approved)
+            handleFinalRedirect()
+        } catch (err) {
+            console.error('[CompleteProfile] Error:', err)
+            setError('Failed to update profile. Please try again.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    // Return empty if redirecting
+    if (!user || user.profileComplete) return null
+
+    return (
+        <div style={pageStyle}>
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} style={cardStyle}>
+                <h2 style={{ color: '#7C3E2F', fontWeight: 900, fontSize: '2rem', marginBottom: '0.5rem' }}>Almost There</h2>
+                <p style={{ color: '#888', marginBottom: '2rem' }}>Complete your profile to access your dashboard.</p>
+
+                {error && <div style={{ background: '#fee2e2', color: '#dc2626', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</div>}
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>Phone Number</label>
+                        <input name="phone" placeholder="e.g. +91 9876543210" value={form.phone} onChange={handleChange} style={inputStyle} required />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>Region / City</label>
+                        <input name="region" placeholder="e.g. Delhi, North Campus" value={form.region} onChange={handleChange} style={inputStyle} required />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>College / University</label>
+                        <input name="college" placeholder="Your College Name" value={form.college} onChange={handleChange} style={inputStyle} required />
+                    </div>
+
+                    <button type="submit" disabled={loading} style={{ ...btnStyle, opacity: loading ? 0.7 : 1, marginTop: '0.5rem' }}>
+                        {loading ? 'Saving...' : 'Complete Profile'}
+                    </button>
+                </form>
+            </motion.div>
+        </div>
+    )
+}
+
+const pageStyle = { minHeight: '100vh', background: '#F5F3EF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Poppins', sans-serif", padding: '2rem' }
+const cardStyle = { background: '#fff', borderRadius: '1.5rem', padding: '3rem', width: '100%', maxWidth: '440px', boxShadow: '0 8px 40px rgba(0,0,0,0.08)' }
+const inputStyle = { padding: '0.85rem 1rem', borderRadius: '0.75rem', border: '2px solid #eee', fontSize: '1rem', outline: 'none', fontFamily: 'inherit' }
+const btnStyle = { padding: '1rem', background: '#7C3E2F', color: '#fff', border: 'none', borderRadius: '0.75rem', fontSize: '1rem', fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }
+
+export default CompleteProfile
