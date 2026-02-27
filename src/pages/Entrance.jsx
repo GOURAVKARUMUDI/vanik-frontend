@@ -77,19 +77,15 @@ const Entrance = () => {
                 transition={{ delay: 1.2, duration: 0.5 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={handleGoogleLogin}
-                disabled={loading}
+                onClick={() => navigate('/home')}
                 style={{
-                    display: 'flex', alignItems: 'center', gap: '1rem',
-                    padding: '1rem 2.5rem', background: '#fff', color: '#444',
-                    border: '2px solid #eee', borderRadius: '999px', fontSize: '1.1rem',
+                    padding: '1.2rem 3rem', background: '#7C3E2F', color: '#fff',
+                    border: 'none', borderRadius: '999px', fontSize: '1.2rem',
                     fontWeight: 700, cursor: 'pointer', letterSpacing: '0.05em',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
-                    opacity: loading ? 0.7 : 1
+                    boxShadow: '0 8px 32px rgba(124, 62, 47, 0.2)'
                 }}
             >
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '24px', height: '24px' }} />
-                {loading ? 'Joining...' : 'Join with Google'}
+                Get Started
             </motion.button>
 
             <motion.p

@@ -46,21 +46,38 @@ const Home = () => {
                         Browse Marketplace
                     </button>
 
-                    <button
-                        onClick={() => navigate(getDashboardPath())}
-                        style={btnStyle('#D4AF37')}
-                    >
-                        {user ? 'My Dashboard' : 'Get Started'}
-                    </button>
+                    {user ? (
+                        <button
+                            onClick={() => navigate(getDashboardPath())}
+                            style={btnStyle('#D4AF37')}
+                        >
+                            My Dashboard
+                        </button>
+                    ) : (
+                        <>
+                            <button
+                                onClick={() => navigate('/login')}
+                                style={btnStyle('#D4AF37')}
+                            >
+                                Sign In
+                            </button>
+                            <button
+                                onClick={() => navigate('/register')}
+                                style={btnStyle('#fff', '#7C3E2F')}
+                            >
+                                Join Now
+                            </button>
+                        </>
+                    )}
                 </div>
             </motion.div>
         </div>
     )
 }
 
-const btnStyle = (bg) => ({
-    padding: '1rem 2.5rem', background: bg, color: '#fff',
-    border: 'none', borderRadius: '999px', fontSize: '1rem',
+const btnStyle = (bg, color = '#fff') => ({
+    padding: '1rem 2.5rem', background: bg, color: color,
+    border: bg === '#fff' ? '2px solid #7C3E2F' : 'none', borderRadius: '999px', fontSize: '1rem',
     fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
 })
 

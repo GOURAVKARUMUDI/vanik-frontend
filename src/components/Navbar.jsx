@@ -49,7 +49,7 @@ const Navbar = () => {
                     ) : (
                         <>
                             <span onClick={() => navigate('/login')} style={linkStyle(isActive('/login'))}>Login</span>
-                            <button onClick={() => navigate('/')} style={registerBtn}>Join VANIK</button>
+                            <button onClick={() => navigate('/register')} style={registerBtn}>Join VANIK</button>
                         </>
                     )}
                 </div>

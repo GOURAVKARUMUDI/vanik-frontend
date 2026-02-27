@@ -32,10 +32,13 @@ const SelectRole = () => {
         setLoading(true)
         setError('')
         try {
+            const uid = partialUser._id || partialUser.uid
+            if (!uid) throw new Error('Session lost. Please try logging in again.')
+
             const profile = {
-                uid: partialUser._id,
-                name: partialUser.name,
-                email: partialUser.email,
+                uid: uid,
+                name: partialUser.name || '',
+                email: partialUser.email || '',
                 role: selectedRole,
                 profileComplete: false,
                 approved: selectedRole === 'buyer' ? true : false,
@@ -43,20 +46,20 @@ const SelectRole = () => {
             }
 
             // Save to RTDB
-            await set(ref(database, `users/${partialUser._id}`), profile)
+            await set(ref(database, `users/${uid}`), profile)
 
             // Update AuthContext user with the new role and profileComplete flag
-            const updatedUser = { _id: partialUser._id, ...profile }
-            // NOTE: We update context directly, or the components that need it will read it on refresh
+            const updatedUser = { _id: uid, ...profile }
             if (setUser) setUser(updatedUser)
             localStorage.setItem('vanik_user', JSON.stringify(updatedUser))
 
-            // Push them to Login as per user request
-            navigate('/login')
-
+            // Short delay to ensure localStorage is set before navigation
+            setTimeout(() => {
+                navigate('/login')
+            }, 100)
         } catch (err) {
             console.error('[SelectRole] Error saving role:', err)
-            setError('Failed to save role. Please try again.')
+            setError(err.message || 'Failed to save role. Please try again.')
         } finally {
             setLoading(false)
         }

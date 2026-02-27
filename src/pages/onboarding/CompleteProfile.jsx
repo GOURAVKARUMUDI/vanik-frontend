@@ -48,27 +48,32 @@ const CompleteProfile = () => {
         setError('')
 
         try {
+            const userId = user._id || user.uid
+            if (!userId) throw new Error('User session lost. Please log in again.')
+
             const updates = {
                 phone: form.phone.trim(),
                 city: form.city.trim(),
                 campus: form.campus.trim(),
-                college: form.campus.trim(), // Keep college for backward compatibility
-                region: form.city.trim(),    // Keep region for backward compatibility
+                college: form.campus.trim(),
+                region: form.city.trim(),
                 profileComplete: true,
             }
             // Update RTDB
-            await updateUserProfile(user._id, updates)
+            await updateUserProfile(userId, updates)
 
-            // Update AuthContext & localStorage
+            // Explicitly sync state
             const updatedUser = { ...user, ...updates }
-            setUser(updatedUser)
+            if (setUser) setUser(updatedUser)
             localStorage.setItem('vanik_user', JSON.stringify(updatedUser))
 
-            // Redirect based on role
-            handleFinalRedirect()
+            // Short delay to ensure state reflects
+            setTimeout(() => {
+                handleFinalRedirect()
+            }, 100)
         } catch (err) {
             console.error('[CompleteProfile] Error:', err)
-            setError('Failed to update profile. Please check your connection and try again.')
+            setError(err.message || 'Failed to update profile. Please try again.')
         } finally {
             setLoading(false)
         }
