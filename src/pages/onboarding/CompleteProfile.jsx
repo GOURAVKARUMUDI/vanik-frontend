@@ -12,11 +12,12 @@ const CompleteProfile = () => {
 
     const [form, setForm] = useState({
         phone: '',
-        region: '',
-        college: user?.college || '',
+        city: '',
+        campus: user?.college || '',
     })
 
     const handleFinalRedirect = useCallback(() => {
+        if (!user) return;
         if (user.role === 'buyer') navigate('/buyer-dashboard')
         else if (user.role === 'seller') navigate('/seller-dashboard')
         else if (user.role === 'admin') navigate('/admin')
@@ -36,18 +37,23 @@ const CompleteProfile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!form.phone || !form.region || !form.college) {
-            setError('Please complete all fields.')
+
+        // Basic validation to avoid "invalid input"
+        if (!form.phone.trim() || !form.city.trim() || !form.campus.trim()) {
+            setError('Please complete all fields with valid information.')
             return
         }
+
         setLoading(true)
         setError('')
 
         try {
             const updates = {
-                phone: form.phone,
-                region: form.region,
-                college: form.college,
+                phone: form.phone.trim(),
+                city: form.city.trim(),
+                campus: form.campus.trim(),
+                college: form.campus.trim(), // Keep college for backward compatibility
+                region: form.city.trim(),    // Keep region for backward compatibility
                 profileComplete: true,
             }
             // Update RTDB
@@ -58,11 +64,11 @@ const CompleteProfile = () => {
             setUser(updatedUser)
             localStorage.setItem('vanik_user', JSON.stringify(updatedUser))
 
-            // Redirect based on role (Note: Sellers might be blocked by RoleProtected if not approved)
+            // Redirect based on role
             handleFinalRedirect()
         } catch (err) {
             console.error('[CompleteProfile] Error:', err)
-            setError('Failed to update profile. Please try again.')
+            setError('Failed to update profile. Please check your connection and try again.')
         } finally {
             setLoading(false)
         }
@@ -87,13 +93,13 @@ const CompleteProfile = () => {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>Region / City</label>
-                        <input name="region" placeholder="e.g. Delhi, North Campus" value={form.region} onChange={handleChange} style={inputStyle} required />
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>City</label>
+                        <input name="city" placeholder="e.g. Delhi, Mumbai" value={form.city} onChange={handleChange} style={inputStyle} required />
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>College / University</label>
-                        <input name="college" placeholder="Your College Name" value={form.college} onChange={handleChange} style={inputStyle} required />
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>Campus</label>
+                        <input name="campus" placeholder="e.g. North Campus, Main University" value={form.campus} onChange={handleChange} style={inputStyle} required />
                     </div>
 
                     <button type="submit" disabled={loading} style={{ ...btnStyle, opacity: loading ? 0.7 : 1, marginTop: '0.5rem' }}>

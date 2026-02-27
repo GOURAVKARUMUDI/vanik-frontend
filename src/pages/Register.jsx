@@ -66,7 +66,7 @@ const Register = () => {
                     <input name="name" placeholder="Full Name *" value={form.name} onChange={handleChange} style={inputStyle} required />
                     <input name="email" type="email" placeholder="Email *" value={form.email} onChange={handleChange} style={inputStyle} required />
                     <input name="password" type="password" placeholder="Password *" value={form.password} onChange={handleChange} style={inputStyle} required />
-                    <input name="college" placeholder="College / Campus" value={form.college} onChange={handleChange} style={inputStyle} />
+                    <input name="college" placeholder="Campus Name (e.g. North Campus)" value={form.college} onChange={handleChange} style={inputStyle} />
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <label style={{ fontWeight: 600, color: '#555', fontSize: '0.9rem' }}>I want to:</label>
@@ -95,7 +95,7 @@ const Register = () => {
                         style={{ ...googleBtnStyle, opacity: loading ? 0.7 : 1 }}
                     >
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '20px', height: '20px' }} />
-                        Continue with Google
+                        Sign up with Google
                     </button>
                 </form>
 

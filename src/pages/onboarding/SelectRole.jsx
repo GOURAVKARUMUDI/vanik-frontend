@@ -51,8 +51,8 @@ const SelectRole = () => {
             if (setUser) setUser(updatedUser)
             localStorage.setItem('vanik_user', JSON.stringify(updatedUser))
 
-            // Push them to the final profile completion step
-            navigate('/complete-profile')
+            // Push them to Login as per user request
+            navigate('/login')
 
         } catch (err) {
             console.error('[SelectRole] Error saving role:', err)

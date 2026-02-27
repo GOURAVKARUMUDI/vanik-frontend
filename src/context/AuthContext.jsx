@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }) => {
             email: data.email,
             role: data.role,
             college: data.college,
+            profileComplete: data.profileComplete || false,
         }
         localStorage.setItem('vanik_user', JSON.stringify(userData))
         setUser(userData)
@@ -74,6 +75,7 @@ export const AuthProvider = ({ children }) => {
             email: data.email,
             role: data.role,
             college: data.college,
+            profileComplete: data.profileComplete || false,
         }
         localStorage.setItem('vanik_user', JSON.stringify(userData))
         setUser(userData)

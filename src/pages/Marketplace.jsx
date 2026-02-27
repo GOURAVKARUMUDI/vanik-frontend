@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { getProducts } from '../services/productService'
+import { seedProductsIfEmpty } from '../services/seedService'
 
 const Marketplace = () => {
     const { user } = useAuth()
@@ -14,6 +15,7 @@ const Marketplace = () => {
     const [error, setError] = useState('')
     const [search, setSearch] = useState('')
     const [category, setCategory] = useState('')
+    const [nearMe, setNearMe] = useState(false)
 
     const fetchProducts = async () => {
         setLoading(true); setError('')
@@ -29,12 +31,22 @@ const Marketplace = () => {
         }
     }
 
-    useEffect(() => { fetchProducts() }, [search, category])
+    useEffect(() => {
+        seedProductsIfEmpty().then(() => fetchProducts())
+
+        // Polling for marketplace updates every 30 seconds
+        const interval = setInterval(fetchProducts, 30000)
+        return () => clearInterval(interval)
+    }, [search, category])
+
+    const displayedProducts = nearMe && user?.campus
+        ? products.filter(p => p.campus?.toLowerCase() === user.campus.toLowerCase())
+        : products
 
     const handleBuy = (product) => {
         if (!user) { navigate('/login'); return }
         addToCart(product)
-        alert(`"${product.title}" added to cart!`)
+        navigate('/cart')
     }
 
     const imageUrl = (img) => {
@@ -65,6 +77,23 @@ const Marketplace = () => {
                             <option value="">All Categories</option>
                             {['Books', 'Electronics', 'Apparel', 'Stationery', 'Other'].map(c => <option key={c}>{c}</option>)}
                         </select>
+                        {user && (
+                            <button
+                                onClick={() => setNearMe(!nearMe)}
+                                style={{
+                                    padding: '0.75rem 1.25rem',
+                                    borderRadius: '0.6rem',
+                                    border: '2px solid #7C3E2F',
+                                    background: nearMe ? '#7C3E2F' : 'transparent',
+                                    color: nearMe ? '#fff' : '#7C3E2F',
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                {nearMe ? '📍 Near Me: ON' : '📍 Show All Campus'}
+                            </button>
+                        )}
                     </div>
                 </motion.div>
 
@@ -82,15 +111,15 @@ const Marketplace = () => {
                     </div>
                 )}
 
-                {!loading && !error && products.length === 0 && (
+                {!loading && !error && displayedProducts.length === 0 && (
                     <div style={{ textAlign: 'center', padding: '4rem', background: '#fff', borderRadius: '1rem', color: '#888' }}>
-                        No products found. {user?.role === 'seller' && <span>Be the first to <span onClick={() => navigate('/seller-dashboard')} style={{ color: '#7C3E2F', cursor: 'pointer', fontWeight: 700 }}>list something!</span></span>}
+                        No products found {nearMe && 'near your campus'}. {user?.role === 'seller' && <span>Be the first to <span onClick={() => navigate('/seller-dashboard')} style={{ color: '#7C3E2F', cursor: 'pointer', fontWeight: 700 }}>list something!</span></span>}
                     </div>
                 )}
 
-                {!loading && products.length > 0 && (
+                {!loading && displayedProducts.length > 0 && (
                     <div style={gridStyle}>
-                        {products.map((product, i) => (
+                        {displayedProducts.map((product, i) => (
                             <motion.div
                                 key={product.id || product._id}
 
@@ -109,7 +138,10 @@ const Marketplace = () => {
                                     />
                                 )}
                                 <div style={{ flex: 1 }}>
-                                    <span style={categoryBadge}>{product.category}</span>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        <span style={categoryBadge}>{product.category}</span>
+                                        <span style={campusTag}>{product.campus || 'Main Campus'}</span>
+                                    </div>
                                     <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1E1E1E', margin: '0.5rem 0 0.25rem' }}>{product.title}</h3>
                                     {product.description && <p style={{ fontSize: '0.82rem', color: '#888', margin: '0 0 0.5rem' }}>{product.description.slice(0, 80)}{product.description.length > 80 ? '…' : ''}</p>}
                                     {product.seller?.name && <p style={{ fontSize: '0.8rem', color: '#aaa', margin: 0 }}>by {product.seller.name} · {product.seller.college}</p>}
@@ -133,6 +165,7 @@ const pageStyle = { minHeight: '100vh', background: '#F5F3EF', padding: '4rem 2r
 const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }
 const cardStyle = { background: '#fff', borderRadius: '1.25rem', padding: '1.5rem', display: 'flex', flexDirection: 'column', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', transition: 'all 0.2s ease' }
 const categoryBadge = { background: '#FFF8E7', color: '#D4AF37', padding: '0.2rem 0.75rem', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }
+const campusTag = { background: '#f3f4f6', color: '#666', padding: '0.2rem 0.75rem', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }
 const buyBtnStyle = { padding: '0.6rem 1.25rem', background: '#7C3E2F', color: '#fff', border: 'none', borderRadius: '0.6rem', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }
 
 export default Marketplace

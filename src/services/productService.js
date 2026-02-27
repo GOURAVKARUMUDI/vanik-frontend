@@ -4,13 +4,15 @@ import api from '../api/axios.js';
  * Get all products, with optional client-side search/category filter.
  */
 export const getProducts = async (filters = {}) => {
-    try { console.log('FETCHING PRODUCTS...');
+    try {
+        console.log('FETCHING PRODUCTS...');
         const queryParams = new URLSearchParams();
         if (filters.search) queryParams.append('search', filters.search);
         if (filters.category) queryParams.append('category', filters.category);
         if (filters.type) queryParams.append('type', filters.type);
         if (filters.minPrice) queryParams.append('minPrice', filters.minPrice);
         if (filters.maxPrice) queryParams.append('maxPrice', filters.maxPrice);
+        if (filters.status) queryParams.append('status', filters.status);
 
         const response = await api.get(`/api/products?${queryParams.toString()}`);
         return response.data;
@@ -23,7 +25,8 @@ export const getProducts = async (filters = {}) => {
  * Get a single product by its ID.
  */
 export const getProductById = async (id) => {
-    try { console.log('FETCHING PRODUCTS...');
+    try {
+        console.log('FETCHING PRODUCTS...');
         const response = await api.get(`/api/products/${id}`);
         return response.data;
     } catch (error) {
@@ -35,7 +38,8 @@ export const getProductById = async (id) => {
  * Create a new product listing. Accepts a FormData because of image uploads.
  */
 export const createProduct = async (formData) => {
-    try { console.log('FETCHING PRODUCTS...');
+    try {
+        console.log('FETCHING PRODUCTS...');
         const response = await api.post('/api/products', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -51,7 +55,8 @@ export const createProduct = async (formData) => {
  * Delete a product by its ID.
  */
 export const deleteProduct = async (id) => {
-    try { console.log('FETCHING PRODUCTS...');
+    try {
+        console.log('FETCHING PRODUCTS...');
         const response = await api.delete(`/api/products/${id}`);
         return response.data;
     } catch (error) {
@@ -63,7 +68,8 @@ export const deleteProduct = async (id) => {
  * Update a product by its ID.
  */
 export const updateProduct = async (id, data) => {
-    try { console.log('FETCHING PRODUCTS...');
+    try {
+        console.log('FETCHING PRODUCTS...');
         // Assume data could be FormData or JSON based on whether image is updated
         let headers = {};
         if (data instanceof FormData) {

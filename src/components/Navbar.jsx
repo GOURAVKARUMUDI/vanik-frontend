@@ -30,19 +30,26 @@ const Navbar = () => {
 
                 <div style={linksStyle}>
                     <span onClick={() => navigate('/marketplace')} style={linkStyle(isActive('/marketplace'))}>Marketplace</span>
-                    <span onClick={() => navigate('/cart')} style={linkStyle(isActive('/cart'))}>
-                        Cart {cart.length > 0 && <span style={cartBadge}>{cart.length}</span>}
-                    </span>
+                    {user && (
+                        <span onClick={() => navigate('/cart')} style={linkStyle(isActive('/cart'))}>
+                            Cart {cart.length > 0 && <span style={cartBadge}>{cart.length}</span>}
+                        </span>
+                    )}
 
                     {user ? (
                         <>
-                            <span onClick={() => navigate(getDashboardPath())} style={linkStyle(false)}>Dashboard</span>
+                            <span onClick={() => navigate(getDashboardPath())} style={linkStyle(isActive('/buyer-dashboard') || isActive('/seller-dashboard') || isActive('/admin'))}>
+                                {user.role === 'buyer' && '🛍️ Buyer Hub'}
+                                {user.role === 'seller' && '📦 Seller Panel'}
+                                {user.role === 'admin' && '🛡️ Admin Panel'}
+                                {!['buyer', 'seller', 'admin'].includes(user.role) && 'Dashboard'}
+                            </span>
                             <button onClick={handleLogout} style={logoutBtn}>Logout</button>
                         </>
                     ) : (
                         <>
                             <span onClick={() => navigate('/login')} style={linkStyle(isActive('/login'))}>Login</span>
-                            <button onClick={() => navigate('/register')} style={registerBtn}>Join VANIK</button>
+                            <button onClick={() => navigate('/')} style={registerBtn}>Join VANIK</button>
                         </>
                     )}
                 </div>

@@ -4,16 +4,18 @@ import api from '../api/axios.js';
  * Create a new order. cartItems = [{ id, title, price }]
  * type = 'buy' | 'rent'
  */
-export const createOrder = async (cartItems, uid, type = 'buy') => {
+export const createOrder = async (cartItems, user, shipping = {}, type = 'buy') => {
     try {
-        // The backend expects single product transactions per order payload currently based on the controller.
-        // We will loop and create orders for each item if there are multiple.
         const orderPromises = cartItems.map(item => {
+            // Calculate delivery fee for this item
+            const deliveryFee = (user?.campus && item?.campus && item.campus.toLowerCase() !== user.campus.toLowerCase()) ? 50 : 0
+
             const orderData = {
                 product: item.id || item._id,
                 type: type,
-                totalPrice: Number(item.price),
-                // Add rental dates if needed in the UI
+                totalPrice: Number(item.price) + deliveryFee,
+                shippingAddress: shipping.address || '',
+                campusDetails: shipping.campus || '',
                 rentalStartDate: null,
                 rentalEndDate: null
             };
