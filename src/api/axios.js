@@ -11,13 +11,14 @@ const api = axios.create({
 // Attach Firebase ID token to every request securely
 api.interceptors.request.use(
     async (config) => {
-        if (auth.currentUser) {
+        // Only attempt to get a token if we have a currently authenticated user
+        if (auth && auth.currentUser) {
             try {
                 // Get fresh Firebase ID token
                 const token = await auth.currentUser.getIdToken();
                 config.headers.Authorization = `Bearer ${token}`
             } catch (error) {
-                console.error("Failed to get Firebase token:", error);
+                console.warn("Failed to get Firebase token, sending request without auth headers", error);
             }
         }
         return config

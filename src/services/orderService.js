@@ -1,4 +1,4 @@
-import api from '../api/axios';
+import api from '../api/axios.js';
 
 /**
  * Create a new order. cartItems = [{ id, title, price }]
