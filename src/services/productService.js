@@ -1,83 +1,78 @@
-import {
-    createProductDb,
-    getAllProductsDb,
-    getProductByIdDb,
-    updateProductDb,
-    deleteProductDb,
-} from './productDbService'
+import api from '../api/axios';
 
 /**
  * Get all products, with optional client-side search/category filter.
  */
 export const getProducts = async (filters = {}) => {
-    const all = await getAllProductsDb()
-    let result = all
-    if (filters.search) {
-        const q = filters.search.toLowerCase()
-        result = result.filter(
-            (p) =>
-                p.title?.toLowerCase().includes(q) ||
-                p.description?.toLowerCase().includes(q)
-        )
+    try {
+        const queryParams = new URLSearchParams();
+        if (filters.search) queryParams.append('search', filters.search);
+        if (filters.category) queryParams.append('category', filters.category);
+        if (filters.type) queryParams.append('type', filters.type);
+        if (filters.minPrice) queryParams.append('minPrice', filters.minPrice);
+        if (filters.maxPrice) queryParams.append('maxPrice', filters.maxPrice);
+
+        const response = await api.get(`/api/products?${queryParams.toString()}`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Failed to fetch products';
     }
-    if (filters.category) {
-        result = result.filter((p) => p.category === filters.category)
-    }
-    if (filters.minPrice) {
-        result = result.filter((p) => Number(p.price) >= Number(filters.minPrice))
-    }
-    if (filters.maxPrice) {
-        result = result.filter((p) => Number(p.price) <= Number(filters.maxPrice))
-    }
-    return result
-}
+};
 
 /**
- * Get a single product by its RTDB key.
+ * Get a single product by its ID.
  */
 export const getProductById = async (id) => {
-    return await getProductByIdDb(id)
-}
-
-/**
- * Create a new product listing. Accepts a FormData or plain object.
- * Images are stored in Firebase Storage separately (imageUrl is stored as a string).
- */
-export const createProduct = async (formDataOrObj) => {
-    let data = {}
-    if (formDataOrObj instanceof FormData) {
-        for (const [key, val] of formDataOrObj.entries()) {
-            if (key !== 'image') data[key] = val
-        }
-    } else {
-        data = { ...formDataOrObj }
+    try {
+        const response = await api.get(`/api/products/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Failed to fetch product';
     }
-    data.status = 'Available'
-    data.createdAt = Date.now()
-    const productId = await createProductDb(data)
-    return { id: productId, ...data }
-}
+};
 
 /**
- * Delete a product by its RTDB key.
+ * Create a new product listing. Accepts a FormData because of image uploads.
+ */
+export const createProduct = async (formData) => {
+    try {
+        const response = await api.post('/api/products', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || error.message || 'Failed to create product';
+    }
+};
+
+/**
+ * Delete a product by its ID.
  */
 export const deleteProduct = async (id) => {
-    await deleteProductDb(id)
-    return { success: true }
-}
+    try {
+        const response = await api.delete(`/api/products/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Failed to delete product';
+    }
+};
 
 /**
- * Update a product by its RTDB key.
+ * Update a product by its ID.
  */
-export const updateProduct = async (id, updates) => {
-    let data = {}
-    if (updates instanceof FormData) {
-        for (const [key, val] of updates.entries()) {
-            if (key !== 'image') data[key] = val
+export const updateProduct = async (id, data) => {
+    try {
+        // Assume data could be FormData or JSON based on whether image is updated
+        let headers = {};
+        if (data instanceof FormData) {
+            headers['Content-Type'] = 'multipart/form-data';
         }
-    } else {
-        data = { ...updates }
+
+        const response = await api.put(`/api/products/${id}`, data, { headers });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Failed to update product';
     }
-    await updateProductDb(id, data)
-    return { id, ...data }
-}
+};

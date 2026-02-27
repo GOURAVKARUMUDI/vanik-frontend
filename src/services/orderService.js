@@ -1,53 +1,55 @@
-import {
-    createOrderDb,
-    getOrdersByUserDb,
-    getAllOrdersDb,
-    updateOrderDb,
-} from './orderDbService'
+import api from '../api/axios';
 
 /**
  * Create a new order. cartItems = [{ id, title, price }]
- * uid is the Firebase Auth UID of the buyer.
+ * type = 'buy' | 'rent'
  */
-export const createOrder = async (cartItems, uid) => {
-    const items = cartItems.map((item) => ({
-        productId: item.id || item._id,
-        title: item.title || 'Product',
-        price: item.price,
-        quantity: 1,
-    }))
-    const total = items.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0)
-    const orderData = {
-        uid: uid || null,
-        items,
-        totalPrice: total,
-        status: 'Pending',
-        createdAt: Date.now(),
+export const createOrder = async (cartItems, uid, type = 'buy') => {
+    try {
+        // The backend expects single product transactions per order payload currently based on the controller.
+        // We will loop and create orders for each item if there are multiple.
+        const orderPromises = cartItems.map(item => {
+            const orderData = {
+                product: item.id || item._id,
+                type: type,
+                totalPrice: Number(item.price),
+                // Add rental dates if needed in the UI
+                rentalStartDate: null,
+                rentalEndDate: null
+            };
+            return api.post('/api/orders', orderData);
+        });
+
+        // Wait for all items to be processed
+        const responses = await Promise.all(orderPromises);
+
+        // Return the first created order as a proxy for success, or combine them
+        return responses.length > 0 ? responses[0].data : { success: true };
+    } catch (error) {
+        throw error.response?.data?.message || 'Failed to create order';
     }
-    const orderId = await createOrderDb(orderData)
-    return { id: orderId, ...orderData }
-}
+};
 
 /**
  * Get orders for the currently logged-in user.
- * uid = Firebase Auth UID
  */
 export const getMyOrders = async (uid) => {
-    if (!uid) return []
-    return await getOrdersByUserDb(uid)
-}
-
-/**
- * Get all orders (admin use).
- */
-export const getAllOrders = async () => {
-    return await getAllOrdersDb()
-}
+    try {
+        const response = await api.get('/api/orders/my');
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Failed to fetch your orders';
+    }
+};
 
 /**
  * Update order status.
  */
 export const updateOrderStatus = async (id, status) => {
-    await updateOrderDb(id, { status })
-    return { id, status }
-}
+    try {
+        const response = await api.put(`/api/orders/${id}/status`, { status });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data?.message || 'Failed to update order status';
+    }
+};
