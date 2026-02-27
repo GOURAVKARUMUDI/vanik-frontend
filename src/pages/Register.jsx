@@ -61,51 +61,30 @@ const Register = () => {
     return (
         <div style={pageStyle}>
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} style={cardStyle}>
-                <h2 style={{ color: '#7C3E2F', fontWeight: 900, fontSize: '2rem', marginBottom: '0.5rem' }}>Create Account</h2>
-                <p style={{ color: '#888', marginBottom: '2rem' }}>Join the VANIK campus community</p>
+                <h2 style={{ color: '#7C3E2F', fontWeight: 900, fontSize: '2.5rem', marginBottom: '0.5rem', textAlign: 'center' }}>Join VANIK</h2>
+                <p style={{ color: '#888', marginBottom: '2.5rem', textAlign: 'center' }}>The exclusive marketplace for your campus community</p>
 
                 {error && <div style={errorStyle}>{error}</div>}
 
-                <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <input name="name" placeholder="Full Name *" value={form.name} onChange={handleChange} style={inputStyle} required />
-                    <input name="email" type="email" placeholder="Email *" value={form.email} onChange={handleChange} style={inputStyle} required />
-                    <input name="password" type="password" placeholder="Password *" value={form.password} onChange={handleChange} style={inputStyle} required />
-                    <input name="college" placeholder="Campus Name (e.g. North Campus)" value={form.college} onChange={handleChange} style={inputStyle} />
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontWeight: 600, color: '#555', fontSize: '0.9rem' }}>I want to:</label>
-                        {[{ val: 'buyer', label: '🛒 Buy on VANIK' }, { val: 'seller', label: '💰 Sell on VANIK' }].map(r => (
-                            <label key={r.val} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                                <input type="radio" name="role" value={r.val} checked={form.role === r.val} onChange={handleChange} />
-                                <span style={{ fontWeight: 600, color: form.role === r.val ? '#7C3E2F' : '#555' }}>{r.label}</span>
-                            </label>
-                        ))}
-                    </div>
-
-                    <button type="submit" disabled={loading} style={{ ...btnStyle, opacity: loading ? 0.7 : 1 }}>
-                        {loading ? 'Creating account...' : 'Create Account'}
-                    </button>
-
-                    <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0' }}>
-                        <div style={{ flex: 1, height: '1px', background: '#eee' }} />
-                        <span style={{ margin: '0 1rem', color: '#888', fontSize: '0.9rem' }}>OR</span>
-                        <div style={{ flex: 1, height: '1px', background: '#eee' }} />
-                    </div>
-
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center' }}>
                     <button
                         type="button"
                         onClick={handleGoogleLogin}
                         disabled={loading}
                         style={{ ...googleBtnStyle, opacity: loading ? 0.7 : 1 }}
                     >
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '20px', height: '20px' }} />
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '24px', height: '24px' }} />
                         Sign up with Google
                     </button>
-                </form>
 
-                <p style={{ marginTop: '1.5rem', color: '#888', textAlign: 'center', fontSize: '0.9rem' }}>
+                    <p style={{ color: '#aaa', fontSize: '0.82rem', textAlign: 'center', lineHeight: 1.5 }}>
+                        Use your university email for instant access and verification within your campus network.
+                    </p>
+                </div>
+
+                <p style={{ marginTop: '2.5rem', color: '#888', textAlign: 'center', fontSize: '0.95rem' }}>
                     Already have an account?{' '}
-                    <span onClick={() => navigate('/login')} style={{ color: '#7C3E2F', cursor: 'pointer', fontWeight: 700 }}>Sign In</span>
+                    <span onClick={() => navigate('/login')} style={{ color: '#7C3E2F', cursor: 'pointer', fontWeight: 800 }}>Sign In</span>
                 </p>
             </motion.div>
         </div>

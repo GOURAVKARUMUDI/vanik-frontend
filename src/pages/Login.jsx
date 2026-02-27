@@ -78,66 +78,35 @@ const Login = () => {
     return (
         <div style={pageStyle}>
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} style={cardStyle}>
-                <h2 style={{ color: '#7C3E2F', fontWeight: 900, fontSize: '2rem', marginBottom: '0.5rem' }}>Welcome Back</h2>
-                <p style={{ color: '#888', marginBottom: '2rem' }}>Sign in to your VANIK account</p>
+                <h2 style={{ color: '#7C3E2F', fontWeight: 900, fontSize: '2.5rem', marginBottom: '0.5rem', textAlign: 'center' }}>Welcome Back</h2>
+                <p style={{ color: '#888', marginBottom: '2.5rem', textAlign: 'center' }}>Sign in to your VANIK account using your campus mail</p>
 
                 {error && (
                     <div style={errorStyle}>
                         {error}
-                        {showResend && (
-                            <button
-                                type="button"
-                                onClick={handleResendVerification}
-                                style={{ marginTop: '0.5rem', padding: '0.4rem 0.8rem', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '0.4rem', fontSize: '0.8rem', cursor: 'pointer', display: 'block' }}
-                            >
-                                Resend verification email
-                            </button>
-                        )}
                     </div>
                 )}
 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        style={inputStyle}
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        style={inputStyle}
-                        required
-                    />
-                    <button type="submit" disabled={loading} style={{ ...btnStyle, opacity: loading ? 0.7 : 1 }}>
-                        {loading ? 'Signing in...' : 'Sign In'}
-                    </button>
-
-                    <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0' }}>
-                        <div style={{ flex: 1, height: '1px', background: '#eee' }} />
-                        <span style={{ margin: '0 1rem', color: '#888', fontSize: '0.9rem' }}>OR</span>
-                        <div style={{ flex: 1, height: '1px', background: '#eee' }} />
-                    </div>
-
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center' }}>
                     <button
                         type="button"
                         onClick={handleGoogleLogin}
                         disabled={loading}
                         style={{ ...googleBtnStyle, opacity: loading ? 0.7 : 1 }}
                     >
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '20px', height: '20px' }} />
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '24px', height: '24px' }} />
                         Continue with Google
                     </button>
-                </form>
 
-                <p style={{ marginTop: '1.5rem', color: '#888', textAlign: 'center', fontSize: '0.9rem' }}>
-                    New here?{' '}
-                    <span onClick={() => navigate('/register')} style={{ color: '#7C3E2F', cursor: 'pointer', fontWeight: 700 }}>
-                        Create Account
+                    <p style={{ color: '#aaa', fontSize: '0.85rem', maxWidth: '300px', textAlign: 'center', lineHeight: 1.4 }}>
+                        By continuing, you agree to VANIK's terms of service and campus community guidelines.
+                    </p>
+                </div>
+
+                <p style={{ marginTop: '2.5rem', color: '#888', textAlign: 'center', fontSize: '0.95rem' }}>
+                    New to VANIK?{' '}
+                    <span onClick={() => navigate('/register')} style={{ color: '#7C3E2F', cursor: 'pointer', fontWeight: 800 }}>
+                        Join Now
                     </span>
                 </p>
             </motion.div>

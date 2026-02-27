@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
+import Footer from '../components/Footer'
 import RoleProtected from '../components/RoleProtected'
 
 // Pages
@@ -19,12 +20,15 @@ import SelectRole from '../pages/onboarding/SelectRole'
 import CompleteProfile from '../pages/onboarding/CompleteProfile'
 import WaitingApproval from '../pages/onboarding/WaitingApproval'
 
-// Layout wrapper for pages with Navbar
+// Layout wrapper for pages with Navbar and Footer
 const WithNav = ({ children }) => (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Navbar />
-        {children}
-    </>
+        <div style={{ flex: 1 }}>
+            {children}
+        </div>
+        <Footer />
+    </div>
 )
 
 const AppRoutes = () => (

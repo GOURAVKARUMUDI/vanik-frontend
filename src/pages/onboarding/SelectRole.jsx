@@ -53,9 +53,9 @@ const SelectRole = () => {
             if (setUser) setUser(updatedUser)
             localStorage.setItem('vanik_user', JSON.stringify(updatedUser))
 
-            // Short delay to ensure localStorage is set before navigation
+            // Navigate directly to complete profile
             setTimeout(() => {
-                navigate('/login')
+                navigate('/complete-profile')
             }, 100)
         } catch (err) {
             console.error('[SelectRole] Error saving role:', err)

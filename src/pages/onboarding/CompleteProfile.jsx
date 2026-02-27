@@ -11,6 +11,7 @@ const CompleteProfile = () => {
     const [error, setError] = useState('')
 
     const [form, setForm] = useState({
+        name: user?.name || '',
         phone: '',
         city: '',
         campus: user?.college || '',
@@ -39,7 +40,7 @@ const CompleteProfile = () => {
         e.preventDefault()
 
         // Basic validation to avoid "invalid input"
-        if (!form.phone.trim() || !form.city.trim() || !form.campus.trim()) {
+        if (!form.name.trim() || !form.phone.trim() || !form.city.trim() || !form.campus.trim()) {
             setError('Please complete all fields with valid information.')
             return
         }
@@ -52,6 +53,7 @@ const CompleteProfile = () => {
             if (!userId) throw new Error('User session lost. Please log in again.')
 
             const updates = {
+                name: form.name.trim(),
                 phone: form.phone.trim(),
                 city: form.city.trim(),
                 campus: form.campus.trim(),
@@ -91,6 +93,11 @@ const CompleteProfile = () => {
                 {error && <div style={{ background: '#fee2e2', color: '#dc2626', padding: '0.75rem', borderRadius: '0.5rem', marginBottom: '1rem', fontSize: '0.9rem' }}>{error}</div>}
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>Full Name</label>
+                        <input name="name" placeholder="John Doe" value={form.name} onChange={handleChange} style={inputStyle} required />
+                    </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#555' }}>Phone Number</label>
