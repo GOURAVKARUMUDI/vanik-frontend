@@ -20,6 +20,7 @@ const Login = () => {
         setError(''); setLoading(true); setShowResend(false);
         try {
             const user = await login(email, password)
+            console.log('[Login] User role:', user.role)
             if (!user.profileComplete) navigate('/complete-profile')
             else if (user.role === 'buyer') navigate('/buyer-dashboard')
             else if (user.role === 'seller') navigate('/seller-dashboard')
@@ -29,6 +30,8 @@ const Login = () => {
             if (err.code === 'auth/unverified-email') {
                 setError(err.message)
                 setShowResend(true)
+            } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+                setError('Invalid email or password.')
             } else {
                 setError(err.message || 'Login failed. Please check your credentials.')
             }

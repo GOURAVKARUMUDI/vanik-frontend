@@ -24,7 +24,11 @@ const Register = () => {
             else if (user.role === 'admin') navigate('/admin')
             else navigate('/home')
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed. Please try again.')
+            if (err.code === 'auth/email-already-in-use') {
+                setError('This email is already registered. Please sign in instead.')
+            } else {
+                setError(err.message || 'Registration failed. Please try again.')
+            }
         } finally {
             setLoading(false)
         }

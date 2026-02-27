@@ -113,19 +113,19 @@ const SellerDashboard = () => {
                     <div style={metricsRow}>
                         <div style={metricCard}>
                             <span style={metricValue}>₹{products.filter(p => p.status === 'Sold').reduce((sum, p) => sum + (p.price || 0), 0)}</span>
-                            <span style={metricLabel}>Revenue</span>
+                            <span style={metricLabel}>Total Revenue</span>
                         </div>
                         <div style={metricCard}>
-                            <span style={metricValue}>{orders.length}</span>
-                            <span style={metricLabel}>Orders</span>
-                        </div>
-                        <div style={metricCard}>
-                            <span style={metricValue}>{orders.filter(o => o.status === 'Delivered').length}</span>
-                            <span style={metricLabel}>Delivered</span>
+                            <span style={metricValue}>{products.filter(p => p.status === 'Sold').length}</span>
+                            <span style={metricLabel}>Items Sold</span>
                         </div>
                         <div style={metricCard}>
                             <span style={metricValue}>{products.filter(p => p.status === 'Available').length}</span>
-                            <span style={metricLabel}>Active</span>
+                            <span style={metricLabel}>Current Items</span>
+                        </div>
+                        <div style={metricCard}>
+                            <span style={metricValue}>{orders.length}</span>
+                            <span style={metricLabel}>Total Orders</span>
                         </div>
                     </div>
 
